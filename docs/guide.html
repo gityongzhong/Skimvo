@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Skimvo 使用指南 · Edge 浏览器</title>
+<style>
+  :root {
+    --bg: #0a0c11;
+    --card: #14161d;
+    --card2: #1b1e27;
+    --line: #2a2e3a;
+    --text: #e8eaf0;
+    --muted: #98a0b0;
+    --blue: #2e7bff;
+    --blue-dim: #1b4fa8;
+    --edge: #35c1f1;
+    --warn: #f0b429;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1100px 600px at 15% -10%, rgba(46,123,255,.20), transparent 60%),
+      radial-gradient(900px 500px at 95% 5%, rgba(53,193,241,.12), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 44px 24px 64px;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+
+  /* ---------- header ---------- */
+  header { display: flex; align-items: center; gap: 18px; margin-bottom: 8px; }
+  .logo {
+    width: 64px; height: 64px; border-radius: 15px;
+    background: linear-gradient(150deg, #0b2fd6, #1f6bff 55%, #35c1f1);
+    display: grid; place-items: center;
+    box-shadow: 0 8px 26px rgba(46,123,255,.35), inset 0 0 0 1px rgba(255,255,255,.18);
+    flex: none;
+  }
+  .logo svg { width: 40px; height: 40px; }
+  h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: .3px; }
+  .sub { color: var(--muted); font-size: 13.5px; }
+  .sub b { color: var(--edge); font-weight: 600; }
+  .meta { margin-left: auto; text-align: right; font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .pill {
+    display: inline-block; padding: 3px 9px; border-radius: 999px;
+    background: rgba(46,123,255,.14); border: 1px solid rgba(46,123,255,.35);
+    color: #9dc0ff; font-size: 11.5px; letter-spacing: .4px;
+  }
+
+  .lead {
+    margin: 22px 0 34px; padding: 16px 18px;
+    border: 1px solid var(--line); border-radius: 14px;
+    background: linear-gradient(180deg, rgba(46,123,255,.08), rgba(46,123,255,.02));
+    font-size: 14px; line-height: 1.75; color: #cfd6e4;
+  }
+  .lead code {
+    background: rgba(255,255,255,.08); padding: 1px 7px; border-radius: 6px;
+    font-family: Consolas, monospace; font-size: 12.5px; color: #b9d2ff;
+  }
+
+  /* ---------- steps ---------- */
+  .step {
+    display: grid; grid-template-columns: 54px 1fr 300px; gap: 18px;
+    align-items: start; padding: 22px 0;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .num {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: grid; place-items: center;
+    background: rgba(46,123,255,.13); border: 1px solid rgba(46,123,255,.4);
+    color: #8fb8ff; font-weight: 700; font-size: 16px;
+  }
+  .step h2 { font-size: 17px; margin: 6px 0 8px; }
+  .step p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.8; }
+  .step p + p { margin-top: 8px; }
+  .step kbd {
+    background: #232733; border: 1px solid #343a49; border-bottom-width: 2px;
+    border-radius: 6px; padding: 1px 7px; font-size: 12px; font-family: inherit;
+  }
+  .hi { color: #9dc0ff; font-weight: 600; }
+
+  /* ---------- mockups ---------- */
+  .art {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px; font-size: 11px; color: #c8cfdd;
+  }
+  .art .cap { color: #6f7788; font-size: 10.5px; margin-top: 8px; text-align: center; }
+
+  /* browser window chrome */
+  .win { background: #1f222b; border-radius: 9px; overflow: hidden; border: 1px solid #2e3340; }
+  .win .tabs { display: flex; gap: 5px; padding: 7px 7px 0; }
+  .win .tab {
+    background: #2a2e3a; border-radius: 6px 6px 0 0; padding: 5px 10px;
+    font-size: 10px; color: #aeb6c6; display: flex; align-items: center; gap: 5px;
+  }
+  .win .tab.on { background: #353b49; color: #fff; }
+  .win .tab i { width: 9px; height: 9px; border-radius: 3px; background: #4c566a; display: inline-block; }
+  .win .bar {
+    display: flex; align-items: center; gap: 7px;
+    padding: 6px 8px; background: #353b49;
+  }
+  .win .url {
+    flex: 1; background: #1b1e26; border-radius: 999px; padding: 5px 11px;
+    color: #dfe5f1; font-family: Consolas, monospace; font-size: 10.5px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .win .url .lock { color: #7ddc9a; }
+  .win .body { padding: 10px; background: #191c24; }
+
+  /* extension page mock */
+  .extpage { display: grid; grid-template-columns: 1fr 92px; gap: 8px; }
+  .extcard {
+    display: flex; gap: 8px; align-items: center;
+    background: #232733; border: 1px solid #2f3542; border-radius: 9px; padding: 8px;
+  }
+  .extcard .ico {
+    width: 30px; height: 30px; border-radius: 8px; flex: none;
+    background: linear-gradient(150deg, #0b2fd6, #1f6bff 55%, #35c1f1);
+    display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 15px;
+    font-family: "Segoe UI", sans-serif;
+  }
+  .extcard .nm { font-size: 11px; color: #fff; }
+  .extcard .ds { font-size: 9.5px; color: #8b93a4; margin-top: 2px; }
+  .sidebar {
+    background: #232733; border: 1px solid #2f3542; border-radius: 9px;
+    padding: 8px; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
+  }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 9.5px; color: #b9c1d1; }
+  .toggle {
+    width: 26px; height: 15px; border-radius: 999px; background: #45506a; position: relative; flex: none;
+  }
+  .toggle::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px;
+    border-radius: 50%; background: #fff;
+  }
+  .toggle.on { background: var(--blue); }
+  .toggle.on::after { left: 13px; }
+  .btn {
+    background: #2f3542; border: 1px solid #3c4454; border-radius: 6px;
+    padding: 5px 8px; font-size: 9.5px; color: #dde3ef; text-align: center;
+  }
+  .btn.primary { background: rgba(46,123,255,.9); border-color: #4d8dff; color: #fff; }
+  .glow {
+    outline: 2px solid rgba(46,123,255,.85);
+    outline-offset: 3px; border-radius: 8px;
+  }
+
+  /* toolbar mock */
+  .toolbar {
+    display: flex; align-items: center; gap: 7px;
+    background: #353b49; border-radius: 8px; padding: 6px 9px;
+  }
+  .toolbar .sp { flex: 1; }
+  .tbtn {
+    width: 20px; height: 20px; border-radius: 5px; background: #454d5e;
+    display: grid; place-items: center; font-size: 10px; color: #cfd6e4; position: relative;
+  }
+  .tbtn .badge {
+    position: absolute; right: -3px; bottom: -3px;
+    background: #0a3cf5; color: #fff; font-size: 7px; font-weight: 700;
+    padding: 0 2px; border-radius: 3px; border: 1px solid #353b49;
+  }
+  .tbtn.logo-t {
+    background: linear-gradient(150deg, #0b2fd6, #2e7bff 60%, #35c1f1);
+    color: #fff; font-weight: 800; font-size: 11px;
+  }
+  .menu {
+    margin-top: 8px; background: #2a2e3a; border: 1px solid #3a4152; border-radius: 8px; padding: 6px;
+  }
+  .menu .item {
+    display: flex; align-items: center; gap: 7px; padding: 5px 6px; border-radius: 5px;
+    font-size: 10px; color: #dbe2ee;
+  }
+  .menu .item.sel { background: rgba(46,123,255,.18); }
+  .menu .item .ico-s {
+    width: 16px; height: 16px; border-radius: 4px;
+    background: linear-gradient(150deg, #0b2fd6, #35c1f1);
+    display: grid; place-items: center; font-size: 9px; font-weight: 700; color: #fff;
+  }
+  .pin { margin-left: auto; color: #8fb8ff; font-size: 11px; }
+
+  /* popup replica */
+  .popup {
+    width: 232px; margin: 0 auto; background: #1e1f24; border-radius: 8px;
+    padding: 12px; border: 1px solid rgba(255,255,255,.09);
+  }
+  .popup .phead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .popup .brand { display: flex; align-items: center; gap: 7px; }
+  .popup .brand .bi {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: linear-gradient(150deg, #0b2fd6, #2e7bff 60%, #35c1f1);
+    display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #fff;
+  }
+  .popup .brand b { font-size: 12.5px; letter-spacing: .3px; }
+  .prow { display: flex; align-items: baseline; justify-content: center; gap: 3px; margin: 4px 0 10px; }
+  .prow .big { font-size: 34px; font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; line-height: 1; }
+  .prow .x { font-size: 15px; color: var(--blue); font-weight: 700; }
+  .pslider { height: 4px; border-radius: 999px; background: linear-gradient(to right, var(--blue) 0 38%, #4a4b53 38% 100%); position: relative; margin-bottom: 5px; }
+  .pslider::after {
+    content: ""; position: absolute; top: 50%; left: 38%; transform: translate(-50%,-50%);
+    width: 11px; height: 11px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--blue);
+  }
+  .pscale { display: flex; justify-content: space-between; font-size: 8px; color: #7b8090; margin-bottom: 10px; }
+  .pgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .pgrid span {
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 5px; padding: 5px 0; text-align: center; font-size: 9.5px; color: #dfe3ec;
+  }
+  .pgrid span.on { background: rgba(46,123,255,.28); border-color: rgba(46,123,255,.8); color: #a8c8ff; font-weight: 700; }
+  .pfoot { text-align: center; font-size: 7.5px; color: #7b8090; margin-top: 9px; line-height: 1.6; }
+
+  /* video page mock */
+  .site { background: #10131a; border-radius: 8px; padding: 8px; }
+  .site .url2 { font-size: 9px; color: #7d8698; margin-bottom: 6px; font-family: Consolas, monospace; }
+  .video {
+    height: 74px; border-radius: 6px; position: relative; overflow: hidden;
+    background: linear-gradient(120deg, #17202e, #0f1a2b 60%, #1a2740);
+    border: 1px solid #232c3d;
+  }
+  .video .play {
+    position: absolute; inset: 0; margin: auto; width: 26px; height: 26px;
+    border-radius: 50%; background: rgba(255,255,255,.13);
+    display: grid; place-items: center; color: #dfe7f5; font-size: 11px;
+  }
+  .video .speed {
+    position: absolute; right: 6px; bottom: 5px; font-size: 8.5px;
+    background: rgba(0,0,0,.55); color: #cfe0ff; padding: 2px 5px; border-radius: 4px;
+  }
+  .bars { margin-top: 7px; display: grid; gap: 4px; }
+  .bars i { height: 4px; border-radius: 3px; background: #222a38; display: block; }
+
+  /* footer cards */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 34px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px;
+  }
+  .card h3 { margin: 0 0 10px; font-size: 14.5px; display: flex; align-items: center; gap: 8px; }
+  .card h3 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+  .card ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; line-height: 1.9; }
+  .card li b { color: #cfd8e8; font-weight: 600; }
+  .card.warn { border-color: rgba(240,180,41,.35); background: linear-gradient(180deg, rgba(240,180,41,.07), rgba(240,180,41,.02)); }
+  .card.warn h3 .dot { background: var(--warn); }
+  .card.warn li b { color: #f3cd7a; }
+
+  footer { margin-top: 30px; text-align: center; color: #626a7a; font-size: 11.5px; line-height: 1.9; }
+  footer code { color: #8b93a4; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M26.5 9.5c-3-1.2-7-.7-9.6 1.4-2.6 2-3.5 5-2.4 7.4 1.1 2.5 4 3.6 7 4.2 2.6.5 4 1.2 4.3 2.5.4 1.7-1.5 3.2-4 3.4-2 .2-4-.4-5.6-1.6"
+              fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>
+        <path d="M33 6.5a15 15 0 0 1-1.8 22" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M7.5 13.5h8M6 19h9M7 24.5h8" stroke="rgba(255,255,255,.42)" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Skimvo 使用指南</h1>
+      <div class="sub">全局网页视频 / 音频变速扩展 · 以 <b>Microsoft Edge</b> 为例（Chrome 步骤完全一样）</div>
+    </div>
+    <div class="meta">
+      <span class="pill">v3.0.1</span><br>
+      安装位置<br><code style="color:#8fb8ff">E:\桌面文件\Skimvo</code>
+    </div>
+  </header>
+
+  <div class="lead">
+    一次性安装约 <b style="color:#fff">1 分钟</b>，之后「设一次速度，所有网页通用」。装好后你会得到：一个工具栏图标（右下角实时显示当前倍数）、一个 280px 的小面板、以及一套每秒自动纠偏的接管逻辑 —— 网站想把速度改回去，会被立刻纠正。
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="step">
+    <div class="num">1</div>
+    <div>
+      <h2>打开扩展管理页</h2>
+      <p>在 Edge 地址栏输入 <span class="hi">edge://extensions</span> 回车。用 Chrome 的话是 <span class="hi">chrome://extensions</span>。</p>
+      <p>（也可以点右上角 <kbd>…</kbd> → 扩展 → 管理扩展，效果一样。）</p>
+    </div>
+    <div class="art">
+      <div class="win">
+        <div class="tabs"><div class="tab on"><i></i>扩展</div><div class="tab"><i></i>新标签页</div></div>
+        <div class="bar">
+          <div class="url"><span class="lock">◈</span>edge://extensions</div>
+        </div>
+        <div class="body" style="height:54px"></div>
+      </div>
+      <div class="cap">地址栏直接输入，不要加 www</div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step">
+    <div class="num">2</div>
+    <div>
+      <h2>打开「开发人员模式」</h2>
+      <p>在页面 <span class="hi">左侧栏最下方</span> 找到「开发人员模式」开关，打开它。</p>
+      <p>打开后，页面顶部才会出现「<span class="hi">加载解压缩的扩展</span>」按钮。不开这个开关，就找不到那个按钮 —— 这是新手最容易卡住的一步。</p>
+    </div>
+    <div class="art">
+      <div class="extpage">
+        <div>
+          <div class="extcard">
+            <div class="ico">S</div>
+            <div>
+              <div class="nm">Skimvo</div>
+              <div class="ds">已加载（示例）</div>
+            </div>
+          </div>
+          <div class="btn" style="margin-top:8px">加载解压缩的扩展</div>
+        </div>
+        <div class="sidebar">
+          <div class="row">
+            <span>开发人员<br>模式</span>
+            <span class="toggle on glow"></span>
+          </div>
+        </div>
+      </div>
+      <div class="cap">左栏底部 → 开关变蓝</div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step">
+    <div class="num">3</div>
+    <div>
+      <h2>加载 Skimvo 文件夹</h2>
+      <p>点「加载解压缩的扩展」，在弹出的选择框里定位到 <span class="hi">E:\桌面文件\Skimvo</span>，<b style="color:#fff">选中这个文件夹本身</b>（不要双击进去选里面的文件），然后点「选择文件夹」。</p>
+      <p>列表里出现 Skimvo 卡片、开关是蓝色 = 安装成功。</p>
+    </div>
+    <div class="art">
+      <div style="background:#1b1e26;border:1px solid #2f3542;border-radius:8px;padding:9px;">
+        <div style="font-size:9.5px;color:#8b93a4;margin-bottom:7px;">选择扩展程序目录</div>
+        <div style="font-family:Consolas,monospace;font-size:10px;color:#cfd6e4;line-height:1.9;">
+          📁 桌面文件<br>
+          &nbsp;&nbsp;└ <span style="background:rgba(46,123,255,.28);border:1px solid rgba(46,123,255,.7);border-radius:4px;padding:1px 5px;color:#a8c8ff;">📁 Skimvo</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├ manifest.json<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├ content.js<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└ popup\
+        </div>
+        <div class="btn primary" style="margin-top:9px">选择文件夹</div>
+      </div>
+      <div class="cap">选文件夹，不是选里面的文件</div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="step">
+    <div class="num">4</div>
+    <div>
+      <h2>把图标固定到工具栏</h2>
+      <p>点工具栏上那个 <span class="hi">拼图</span> 图标 🧩，在列表里找到 Skimvo，点右侧的 <span class="hi">图钉 📌</span> 固定。</p>
+      <p>固定后，蓝底 S 图标会常驻工具栏 —— 以后点它就能开面板。</p>
+    </div>
+    <div class="art">
+      <div class="toolbar">
+        <div class="tbtn">◀</div>
+        <div class="tbtn">▷</div>
+        <div class="sp"></div>
+        <div class="tbtn">🧩</div>
+        <div class="tbtn logo-t">S<span class="badge">6×</span></div>
+        <div class="tbtn">⋯</div>
+      </div>
+      <div class="menu">
+        <div class="item sel">
+          <span class="ico-s">S</span> Skimvo <span class="pin">📌 已固定</span>
+        </div>
+        <div class="item">
+          <span class="ico-s" style="background:#3a4152;color:#98a0b0">?</span> 其他扩展
+        </div>
+      </div>
+      <div class="cap">角标 6× = 当前倍数</div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="step">
+    <div class="num">5</div>
+    <div>
+      <h2>设定你要的速度</h2>
+      <p>点工具栏上的 S 图标打开面板，<b style="color:#fff">三种方式都行</b>：</p>
+      <p>· 直接<b style="color:#fff">点中间的大数字</b>打字（如 <span class="hi">6</span>、<span class="hi">10</span>、<span class="hi">1.75</span>），回车生效，范围 0.07–16×<br>
+         · 拖下面的<b style="color:#fff">滑块</b>（0.25–16×）<br>
+         · 点<b style="color:#fff">预设按钮</b>：0.5 / 1 / 1.25 / 1.5 / 2 / 4 / 6 / 8</p>
+      <p>右上角开关 = 总开关。关掉后完全不接管，恢复网页原生速度。</p>
+    </div>
+    <div class="art" style="padding:14px 12px;">
+      <div class="popup">
+        <div class="phead">
+          <div class="brand"><span class="bi">S</span><b>Skimvo</b></div>
+          <span class="toggle on"></span>
+        </div>
+        <div class="prow"><span class="big">6</span><span class="x">×</span></div>
+        <div class="pslider"></div>
+        <div class="pscale"><span>0.25×</span><span>1×</span><span>16×</span></div>
+        <div class="pgrid">
+          <span>0.5×</span><span>1×</span><span>1.25×</span><span>1.5×</span>
+          <span>2×</span><span>4×</span><span class="on">6×</span><span>8×</span>
+        </div>
+        <div class="pfoot">Skimvo v3.0.1<br>Developer: yongzhong</div>
+      </div>
+      <div class="cap">真实面板布局（280px 宽）</div>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="step">
+    <div class="num">6</div>
+    <div>
+      <h2>刷新视频页，立刻生效</h2>
+      <p><b style="color:#fff">这一步最关键</b>：扩展只对「安装之后打开或刷新过」的页面生效。已经开着的视频标签页必须按 <kbd>F5</kbd> 刷新一次。</p>
+      <p>刷新后你会发现：视频按你设的速度播放，工具栏图标角标同步显示倍数，网页自带的速度按钮被夺回控制权（你手动调速后有 10 秒宽限，之后重新接管）。</p>
+    </div>
+    <div class="art">
+      <div class="site">
+        <div class="url2">▸ 正在播放 · 课程视频</div>
+        <div class="video">
+          <div class="play">▶</div>
+          <div class="speed">6× 播放中</div>
+        </div>
+        <div class="bars"><i style="width:100%"></i><i style="width:78%"></i><i style="width:52%"></i></div>
+      </div>
+      <div class="cap">视频照常播，速度已被接管</div>
+    </div>
+  </section>
+
+  <!-- footer cards -->
+  <div class="cards">
+    <div class="card">
+      <h3><span class="dot"></span>更新版本怎么做</h3>
+      <ul>
+        <li>我改完代码后，会<b>原地覆盖</b> <code style="color:#8fb8ff">E:\桌面文件\Skimvo</code>，路径永远不变</li>
+        <li>你只需：<b>edge://extensions</b> → Skimvo 卡片点 <b>↻ 刷新</b> → 视频页 F5</li>
+        <li>核对版本：点开面板看底部，显示 <b>Skimvo v3.0.1</b> 即为最新</li>
+        <li>如果工具栏图标没换，取消固定再重新固定一次即可</li>
+      </ul>
+    </div>
+    <div class="card warn">
+      <h3><span class="dot"></span>三条红线</h3>
+      <ul>
+        <li><b>不要删除、不要移动</b> <code style="color:#8fb8ff">E:\桌面文件\Skimvo</code> —— 浏览器是直接引用这个目录，删了扩展立刻报错</li>
+        <li>同一个扩展<b>只装一份</b>：解压目录 和 CRX 二选一，两份同时启用会互相打架</li>
+        <li><b>4× 以上自动静音</b>，这是设计如此（高倍速声音已是噪音）；降回 4× 以内会自动恢复声音</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    速度上限 16× 是浏览器硬限制 · 8× 以上画面会掉帧，是解码器跟不上，不是扩展的问题<br>
+    在线视频的实际可播倍速 ≈ 下载带宽 ÷ 视频码率，卡顿说明到带宽瓶颈了<br>
+    <code>Skimvo · Developer: yongzhong</code>
+  </footer>
+
+</div>
+</body>
+</html>

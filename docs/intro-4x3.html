@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Skimvo 介绍图 4:3</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 900px; overflow: hidden; }
+  body {
+    background:
+      radial-gradient(760px 520px at 8% 4%, rgba(28, 86, 255, .55), transparent 62%),
+      radial-gradient(680px 460px at 96% 96%, rgba(26, 170, 255, .34), transparent 60%),
+      radial-gradient(420px 300px at 62% 42%, rgba(46, 123, 255, .18), transparent 65%),
+      #05070d;
+    color: #eef2fa;
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+  }
+  /* 细网格纹理 */
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(900px 700px at 30% 30%, #000 25%, transparent 78%);
+    -webkit-mask-image: radial-gradient(900px 700px at 30% 30%, #000 25%, transparent 78%);
+  }
+  .inner { position: relative; padding: 62px 64px 0; height: 100%; display: flex; flex-direction: column; }
+
+  /* ---------- 顶部品牌 ---------- */
+  .brand { display: flex; align-items: center; gap: 22px; }
+  .logo {
+    width: 104px; height: 104px; border-radius: 26px; flex: none;
+    overflow: hidden;
+    box-shadow:
+      0 18px 46px rgba(20, 80, 255, .48),
+      0 0 0 1px rgba(255,255,255,.20) inset;
+  }
+  .logo img { width: 100%; height: 100%; display: block; }
+  .brand .txt .name {
+    font-size: 58px; font-weight: 800; letter-spacing: 1px; line-height: 1;
+  }
+  .brand .txt .sub {
+    margin-top: 10px; font-size: 17px; letter-spacing: 3.4px;
+    text-transform: uppercase; color: #7fa9ff; font-weight: 600;
+  }
+
+  /* ---------- 主标题 ---------- */
+  .headline {
+    margin-top: 66px;
+    font-size: 46px; font-weight: 800; line-height: 1.24; letter-spacing: .5px;
+  }
+  .headline em {
+    font-style: normal;
+    background: linear-gradient(100deg, #5b9cff, #35c1f1 60%, #7ee0ff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .desc {
+    margin-top: 20px; font-size: 18.5px; line-height: 1.85; color: #a9b4c9; max-width: 620px;
+  }
+
+  /* ---------- 特性 ---------- */
+  .feats { margin-top: 44px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; max-width: 600px; }
+  .feat { display: flex; align-items: center; gap: 11px; font-size: 15.5px; color: #cdd7ea; }
+  .feat .tick {
+    width: 22px; height: 22px; border-radius: 7px; flex: none;
+    background: rgba(46,123,255,.18); border: 1px solid rgba(90,155,255,.55);
+    display: grid; place-items: center; font-size: 12px; color: #8fbcff;
+  }
+
+  /* ---------- 右侧面板 ---------- */
+  .stage {
+    position: absolute; right: 56px; top: 208px; width: 372px;
+  }
+  .glowring {
+    position: absolute; inset: -34px -28px;
+    background: radial-gradient(closest-side, rgba(46,123,255,.34), transparent 72%);
+    filter: blur(6px);
+  }
+  .popup {
+    position: relative; width: 300px; margin: 0 auto;
+    background: #1b1d24; border-radius: 14px; padding: 18px;
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 30px 70px rgba(0,0,0,.62);
+  }
+  .phead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .brandrow { display: flex; align-items: center; gap: 9px; }
+  .brandrow .bi {
+    width: 27px; height: 27px; border-radius: 8px; overflow: hidden;
+  }
+  .brandrow .bi img { width: 100%; height: 100%; display: block; }
+  .brandrow b { font-size: 15px; letter-spacing: .3px; }
+  .toggle { width: 34px; height: 19px; border-radius: 999px; background: #2e7bff; position: relative; }
+  .toggle::after {
+    content: ""; position: absolute; top: 2.5px; left: 17px;
+    width: 14px; height: 14px; border-radius: 50%; background: #fff;
+  }
+  .prow { display: flex; align-items: baseline; justify-content: center; gap: 4px; margin: 6px 0 14px; }
+  .prow .big { font-size: 46px; font-weight: 800; color: #2e7bff; line-height: 1; font-variant-numeric: tabular-nums; }
+  .prow .x { font-size: 19px; font-weight: 700; color: #2e7bff; }
+  .pslider { height: 5px; border-radius: 999px; background: linear-gradient(to right, #2e7bff 0 38%, #4a4b53 38% 100%); position: relative; }
+  .pslider::after {
+    content: ""; position: absolute; top: 50%; left: 38%; transform: translate(-50%,-50%);
+    width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2.5px #2e7bff;
+  }
+  .pscale { display: flex; justify-content: space-between; font-size: 10px; color: #7b8090; margin: 8px 0 13px; }
+  .pgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .pgrid span {
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.09);
+    border-radius: 7px; padding: 7px 0; text-align: center; font-size: 12px; color: #dfe3ec;
+  }
+  .pgrid span.on { background: rgba(46,123,255,.3); border-color: rgba(46,123,255,.85); color: #b5d0ff; font-weight: 700; }
+  .pfoot { text-align: center; font-size: 9.5px; color: #767c8c; margin-top: 13px; line-height: 1.7; }
+
+  /* 工具栏示意 */
+  .toolbar {
+    position: relative; margin: 22px auto 0; width: 300px;
+    background: #2b303c; border: 1px solid rgba(255,255,255,.09);
+    border-radius: 10px; padding: 9px 12px; display: flex; align-items: center; gap: 9px;
+    box-shadow: 0 14px 34px rgba(0,0,0,.45);
+  }
+  .toolbar .sp { flex: 1; }
+  .tbtn {
+    width: 26px; height: 26px; border-radius: 6px; background: #3b4252;
+    display: grid; place-items: center; font-size: 12px; color: #cfd6e4; position: relative;
+  }
+  .tbtn .puzzle { display: grid; grid-template-columns: 4px 4px; grid-template-rows: 4px 4px; gap: 2px; }
+  .tbtn .puzzle i { background: #b9c2d4; border-radius: 1.5px; display: block; }
+  .tbtn.logo {
+    background: #0000; overflow: hidden; padding: 0;
+  }
+  .tbtn.logo img { width: 100%; height: 100%; display: block; border-radius: 6px; }
+  .tbtn .badge {
+    position: absolute; right: -4px; bottom: -4px;
+    background: #0a3cf5; color: #fff; font-size: 8.5px; font-weight: 700;
+    padding: 1px 3px; border-radius: 4px; border: 1.5px solid #2b303c;
+  }
+  .annot {
+    margin-top: 12px; text-align: center; font-size: 12.5px; color: #6f7a90;
+  }
+  .annot b { color: #8fbcff; font-weight: 600; }
+
+
+  /* ---------- 数据条 ---------- */
+  .stats { display: flex; gap: 54px; margin-top: 46px; }
+  .stat .v {
+    font-size: 34px; font-weight: 800; line-height: 1;
+    background: linear-gradient(100deg, #6ea6ff, #35c1f1);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat .v small { font-size: 17px; font-weight: 700; }
+  .stat .k { margin-top: 8px; font-size: 12.5px; color: #7b869c; letter-spacing: .5px; }
+
+  /* ---------- 底部刻度尺 ---------- */
+  .ruler { margin-top: auto; padding-top: 30px; }
+  .ruler .labels {
+    display: flex; justify-content: space-between;
+    font-size: 12.5px; color: #6b7688; letter-spacing: .6px; margin-bottom: 11px;
+  }
+  .ruler .labels span.on { color: #8fbcff; font-weight: 700; }
+  .ruler .track {
+    position: relative; height: 6px; border-radius: 999px;
+    background: rgba(255,255,255,.09);
+  }
+  .ruler .fill {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 40%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1c50d8, #2e7bff 58%, #38b7f0);
+    box-shadow: 0 0 24px rgba(46,123,255,.5);
+  }
+  .ruler .knob {
+    position: absolute; left: 40%; top: 50%; transform: translate(-50%, -50%);
+    width: 17px; height: 17px; border-radius: 50%; background: #fff;
+    box-shadow: 0 0 0 3.5px #2e7bff, 0 0 26px rgba(46,123,255,.85);
+  }
+
+  /* ---------- 页脚 ---------- */
+  .foot {
+    margin-top: 34px; margin-bottom: 42px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 14px; color: #7b869c;
+  }
+  .foot .sep { color: #37404f; }
+  .foot b { color: #cfd8e8; font-weight: 600; }
+  .chips { margin-left: auto; display: flex; gap: 9px; }
+  .chip {
+    padding: 6px 13px; border-radius: 999px; font-size: 12.5px;
+    background: rgba(46,123,255,.13); border: 1px solid rgba(90,155,255,.4); color: #9dc0ff;
+  }
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<div class="inner">
+
+  <div class="brand">
+    <div class="logo"><img src="../icons/icon512.png" alt="Skimvo" /></div>
+    <div class="txt">
+      <div class="name">Skimvo</div>
+      <div class="sub">Speed · Skim · Video</div>
+    </div>
+  </div>
+
+  <div class="headline">一个速度，<em>全站通用</em>。</div>
+  <div class="desc">
+    给所有网页的视频与音频统一设定播放速度，0.07×–16× 任意值。<br>
+    设一次就忘掉它 —— 刷新、换站、新开标签页，全部自动生效。
+  </div>
+
+  <div class="feats">
+    <div class="feat"><span class="tick">✓</span>0.25–16× 全局变速</div>
+    <div class="feat"><span class="tick">✓</span>点大数字手动输入任意倍数</div>
+    <div class="feat"><span class="tick">✓</span>工具栏角标实时显示倍率</div>
+    <div class="feat"><span class="tick">✓</span>4× 以上自动静音不吵人</div>
+    <div class="feat"><span class="tick">✓</span>网站想改回速度会被纠正</div>
+    <div class="feat"><span class="tick">✓</span>零依赖 · 不联网 · 不收集数据</div>
+  </div>
+
+  <div class="stage">
+    <div class="glowring"></div>
+    <div class="popup">
+      <div class="phead">
+        <div class="brandrow">
+          <span class="bi"><img src="../icons/icon48.png" alt="" /></span>
+          <b>Skimvo</b>
+        </div>
+        <span class="toggle"></span>
+      </div>
+      <div class="prow"><span class="big">6</span><span class="x">×</span></div>
+      <div class="pslider"></div>
+      <div class="pscale"><span>0.25×</span><span>1×</span><span>16×</span></div>
+      <div class="pgrid">
+        <span>0.5×</span><span>1×</span><span>1.25×</span><span>1.5×</span>
+        <span>2×</span><span>4×</span><span class="on">6×</span><span>8×</span>
+      </div>
+      <div class="pfoot">Skimvo v3.0.1<br>Developer: yongzhong</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="tbtn">◀</div>
+      <div class="tbtn">▷</div>
+      <div class="sp"></div>
+      <div class="tbtn"><span class="puzzle"><i></i><i></i><i></i><i></i></span></div>
+      <div class="tbtn logo"><img src="../icons/icon48.png" alt="" /><span class="badge">6×</span></div>
+      <div class="tbtn">⋯</div>
+    </div>
+    <div class="annot">图标角标 = <b>当前倍率</b>，一眼看出在几倍速</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="v">16<small>×</small></div><div class="k">最高播放倍速</div></div>
+    <div class="stat"><div class="v">8</div><div class="k">一键预设挡位</div></div>
+    <div class="stat"><div class="v">1<small>s</small></div><div class="k">反倍速纠偏间隔</div></div>
+  </div>
+
+  <div class="ruler">
+    <div class="labels">
+      <span>0.07×</span><span>1×</span><span>2×</span><span>4×</span><span>8×</span><span>16×</span>
+    </div>
+    <div class="track">
+      <div class="fill"></div>
+      <div class="knob"></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>Skimvo</b><span class="sep">|</span>Developer: yongzhong
+    <div class="chips">
+      <span class="chip">Edge / Chrome</span>
+      <span class="chip">Manifest V3</span>
+      <span class="chip">v3.0.1</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
