@@ -8,6 +8,8 @@
 - 当前版本：`3.0.1`（版本号以 `manifest.json` 为准）
 - 许可：专有软件，个人非商业免费，商用需授权（见 [LICENSE](LICENSE)）
 
+![Skimvo 介绍图](assets/intro-4x3.png)
+
 ## 目录结构
 
 ```
