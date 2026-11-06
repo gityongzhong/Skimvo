@@ -1,72 +1,100 @@
-# Skimvo
+# Skimvo — 源码仓库（私有）
 
-> 一个速度，全站通用。给所有网页视频 / 音频设统一的播放倍速，设一次，永久生效。
+> 全局网页视频 / 音频变速扩展。**本仓库为私有源码留档**，不对外公开源码；
+> 对外只发布安装包，见 [Skimvo-releases](https://github.com/gityongzhong/Skimvo-releases)。
 
-浏览器扩展（Manifest V3，Chrome / Edge 通用）。**零依赖、零构建、不联网**——加载文件夹即用。
+- 形态：浏览器扩展（Chrome / Edge 通用，Manifest V3）
+- 技术栈：原生 JS + WebExtension API，**零依赖、零构建**，无 package.json、无 npm
+- 当前版本：`3.0.1`（版本号以 `manifest.json` 为准）
+- 许可：专有软件，个人非商业免费，商用需授权（见 [LICENSE](LICENSE)）
 
-![Skimvo 介绍](assets/intro-4x3.png)
+## 目录结构
 
-## 功能
+```
+manifest.json     MV3 清单：权限仅 storage，action 指向 popup
+content.js        核心逻辑：接管 playbackRate、纠正网页重置、高倍率静音、兜底巡检
+background.js     service worker：只负责维护工具栏角标（不常驻，不占资源）
+popup/            面板：popup.html / popup.css / popup.js
+icons/            16 / 48 / 128 + 512 母版（512 只作源图，不进 manifest）
+docs/guide.html   图文使用指南（Edge 为例，纯 CSS 画示意图，可渲染成长图）
+docs/intro-4x3.html  4:3 介绍图（1200×900 固定画布，GitHub 展示用）
+assets/           由上面两个 html 渲染出的成品图
+```
 
-| 功能 | 说明 |
+## 核心逻辑（content.js）
+
+四个要点，改代码时别破坏：
+
+1. **侵入点**：捕获阶段监听 `ratechange`。`applying` 标志位区分「本扩展改的」与「网页改的」，
+   避免自触发死循环。
+2. **对抗重置**：网页非用户操作地改速度 → 立刻纠正回目标值。
+3. **用户优先**：最近 1 秒内有点击 / 按键 / 滚轮，视为用户在播放器里手动调速，
+   进入 **10 秒宽限期**（`MANUAL_GRACE_MS`），期间不干预。
+4. **兜底巡检**：`setInterval(applyAll, 1000)`。这块不能删——它覆盖两个死角：
+   宽限期结束后页面不再触发任何事件；以及脚本注入晚于媒体元素创建。
+
+速度钳制在 `[0.0625, 16]`（浏览器 `playbackRate` 合法区间，越界个别实现会抛错）。
+超过 4×（`MUTE_ABOVE`）自动静音，降回 4× 内只恢复「自己静掉的」（`mutedByUs` WeakSet），
+不动用户手动的静音。
+
+`background.js` 只做一件事：`chrome.storage.onChanged` → `chrome.action.setBadgeText`。
+设置变更靠 `storage.onChanged` 直接下发到所有已打开页面，**不需要消息中转、不需要刷新页面**。
+
+## 本地调试
+
+1. `chrome://extensions`（Edge：`edge://extensions`）→ 打开开发人员模式
+2. 「加载已解压的扩展程序」→ 选本目录
+3. 改完代码 → 扩展卡片点 **↻** → 视频页 **F5**
+4. 面板底部 `Skimvo vX.Y.Z` 是版本核对锚点，显示对不上就是没刷新成功
+
+## 发布流程
+
+```bash
+# 1. 改 manifest.json 的 version，提交
+# 2. 打纯净包（只含扩展文件，不带 README / docs / assets）
+python - <<'EOF'
+import zipfile, os
+z = zipfile.ZipFile('Skimvo-vX.Y.Z.zip', 'w', zipfile.ZIP_DEFLATED)
+for root, _, files in os.walk('Skimvo'):
+    for f in files:
+        p = os.path.join(root, f)
+        z.write(p, p.replace(os.sep, '/'))
+z.close()
+EOF
+
+# 3. 可选：签名 CRX（需 Chrome 打包器）
+#    chrome.exe --pack-extension=<dir> --no-message-box --user-data-dir=<tmp>
+```
+
+然后到 [Skimvo-releases](https://github.com/gityongzhong/Skimvo-releases)：替换 zip、改版本号、发 Release。
+
+**私钥与打包产物不入库**（见 `.gitignore`）：`*.pem` 丢失会导致以后 CRX 的扩展 ID 变化，
+`*.crx` / `*.zip` 放 releases 仓库，不占源码仓库体积。
+
+## 版本记录
+
+| 版本 | 变更 |
 | --- | --- |
-| 全局变速 | 0.07× – 16× 全区间，滑块 / 8 个预设挡位 / 手动输入三种入口 |
-| 全站生效 | 所有网页的 `video` / `audio` 自动套用，新标签、刷新、换站点都保持 |
-| 反倍速纠偏 | 播放器自行把速度改回去时自动拉回，另加每秒兜底巡检 |
-| 工具栏角标 | 图标右下角实时显示当前倍速，暂停接管时显示 ⏸ |
-| 高倍率静音 | 超过 4× 自动静音（刷画面不留噪音），降回 4× 内自动恢复 |
-| 手动宽限 | 检测到你在播放器里手动调速，10 秒内不干预 |
-| 跨设备同步 | 设置存 `chrome.storage.sync`，登录浏览器账号即同步 |
+| 1.0.0 | 首个可用版本（当时叫 SpeedDial）：全局变速 0.25–4×、预设、开关 |
+| 1.1.0 – 1.2.1 | 上限提到 8×；预设改两行；补每秒兜底巡检（修「加速不了」） |
+| 1.3.0 | 大数字可点击输入，区间放宽到 0.07–16× |
+| 2.0.0 | 改名 Velox，换品牌图标，面板加品牌头 |
+| 2.1.0 | 加 `background.js`，工具栏角标实时显示倍速 |
+| 2.2.0 | 滑块上限统一到 16×（此前滑块 8× / 输入 16× 不一致） |
+| 2.3.0 | 4× 以上自动静音（刷课场景）；加版本号显示；加署名行 |
+| 2.3.3 – 2.3.8 | 换 LOGO；面板圆角折腾（结论见下）；改品牌蓝 |
+| 2.4.0 – 2.4.4 | 配色回调为「暗底 + 品牌蓝点缀」；预设定为 0.5/1/1.25/1.5/2/4/6/8 |
+| 3.0.0 | 改名 Skimvo（原名撞车 Chrome 商店已有扩展），目录同步更名 |
+| 3.0.1 | 换 S 形 LOGO；接入 GitHub 私有仓库 + 公开 releases |
 
-## 安装（Edge 为例，Chrome 同理）
+## 踩过的坑
 
-1. 地址栏输入 `edge://extensions`（Chrome 是 `chrome://extensions`）
-2. 打开「开发人员模式」
-3. 点「加载解压缩的扩展」，选择本目录
-4. 工具栏拼图图标 → 把 Skimvo 固定出来
-
-图文流程见 [docs/guide.html](docs/guide.html)，或直接看长图：
-
-![使用指南](assets/guide.png)
-
-## 使用
-
-点工具栏图标弹出面板：
-
-- **大数字**可直接点击输入，支持 `1.75`、`12` 这类精确值，回车生效
-- **滑块** 0.25× – 16× 粗调，**预设** 8 个常用挡位一键直达
-- 右上角开关暂停接管（恢复浏览器原速 1×）
-
-## 技术实现
-
-不依赖任何框架与构建工具，共 6 个文件：
-
-```
-manifest.json     # MV3 清单
-content.js        # 核心：接管 playbackRate、纠正网页重置、高倍率静音
-background.js     # service worker：仅用于维护工具栏角标
-popup/            # 面板：滑块 / 预设 / 输入框 / 开关
-icons/            # 16 / 48 / 128（另有 512 母版）
-```
-
-接管逻辑的四个要点：
-
-1. **侵入点**：监听捕获阶段的 `ratechange`，判断是网页改的还是本扩展改的（`applying` 标志位区分）
-2. **对抗重置**：网页非用户操作地改速度 → 立即纠正回目标值
-3. **用户优先**：最近 1 秒内有点击/按键/滚轮，视为用户手动调速，进入 10 秒宽限期
-4. **兜底巡检**：每秒遍历一次所有媒体元素，覆盖「宽限期结束后不再触发事件」「脚本注入晚于媒体创建」两个死角
-
-设置变更通过 `chrome.storage.onChanged` 实时下发到所有已打开页面，无需刷新。
-
-## 已知边界
-
-- **DRM 流媒体**（Netflix 等）无法接管，所有同类扩展的共同限制
-- **在线视频的实际倍速受带宽限制**：播放消耗数据的速度超过下载速度时会反复缓冲，观感上「上不去」，这是物理瓶颈
-- **4× 以上声音**浏览器会压掉或变成噪音，故本扩展在 4× 以上直接静音
-- **Shadow DOM 内的播放器**暂未覆盖（当前用 `document.querySelectorAll` 遍历）
-
-## 许可
-
-**专有软件，不提供源代码。** 个人非商业用途免费；商业用途需授权（hongyongzhong2020@126.com）；禁止修改后分发、禁止作为自有作品重新发布。详见 [LICENSE](LICENSE)。
-
-Developer: yongzhong
+- **弹窗圆角**：Chrome 扩展弹窗是浏览器绘制的矩形窗口，官方明确回复不会开放形状定制
+  （Chromium issue 40852436）。真圆角必然露出窗口白底四角，二选一，现取「方角 + 无白边」
+  （`html` 画布刷成面板同色）。
+- **交付方式**：早期每次更新都「删目录 + 重新复制」，导致浏览器引用的路径失效、注入失败。
+  现在一律**原地覆盖文件**，桌面目录 `E:\桌面文件\Skimvo` 路径固定不动。
+- **git push 被代理拦**：本机出网代理间歇性返回 502。若 `git push` 反复失败，
+  改用 GitHub Git Database REST API 通道（见 ofd-viewer 仓库的 `tools/sync_github.py`）。
+- **扩展的「不开源」是有限的**：`.crx` / `.zip` 内是明文 JS，解包即可读。
+  许可层面约束「不得摘取源码、不得改包分发」，技术上无法隐藏。
