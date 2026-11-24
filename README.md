@@ -1,12 +1,12 @@
-# Skimvo — 源码仓库（私有）
+# Skimvo
 
-> 全局网页视频 / 音频变速扩展。**本仓库为私有源码留档**，不对外公开源码；
-> 对外只发布安装包，见 [Skimvo-releases](https://github.com/gityongzhong/Skimvo-releases)。
+> 全局网页视频 / 音频变速扩展。源码在本仓库，安装包发布在
+> [Skimvo-releases](https://github.com/gityongzhong/Skimvo-releases)。
 
 - 形态：浏览器扩展（Chrome / Edge 通用，Manifest V3）
 - 技术栈：原生 JS + WebExtension API，**零依赖、零构建**，无 package.json、无 npm
 - 当前版本：`3.0.1`（版本号以 `manifest.json` 为准）
-- 许可：专有软件，个人非商业免费，商用需授权（见 [LICENSE](LICENSE)）
+- 许可：[MIT](LICENSE)（可自由使用、修改、分发，请保留版权声明）
 
 ![Skimvo 介绍图](assets/intro-4x3.png)
 
@@ -98,5 +98,4 @@ EOF
   现在一律**原地覆盖文件**，桌面目录 `E:\桌面文件\Skimvo` 路径固定不动。
 - **git push 被代理拦**：本机出网代理间歇性返回 502。若 `git push` 反复失败，
   改用 GitHub Git Database REST API 通道（见 ofd-viewer 仓库的 `tools/sync_github.py`）。
-- **扩展的「不开源」是有限的**：`.crx` / `.zip` 内是明文 JS，解包即可读。
-  许可层面约束「不得摘取源码、不得改包分发」，技术上无法隐藏。
+- **代码本来就是明文**：`.crx` / `.zip` 内是明文 JS，解包即可读，索性直接开源。
